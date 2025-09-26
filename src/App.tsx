@@ -1,8 +1,10 @@
+import { Toaster } from "react-hot-toast";
 import { Route, Routes } from "react-router-dom";
+
 import { FloatingShape } from "./components/floating-shape";
-import { SignUpPage } from "./pages/sign-up-page";
-import { LoginPage } from "./pages/login-page";
 import { EmailVerificationPage } from "./pages/email-verification-page";
+import { LoginPage } from "./pages/login-page";
+import { SignUpPage } from "./pages/sign-up-page";
 
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
       </Routes>
+      <Toaster />
     </div>
   );
 }

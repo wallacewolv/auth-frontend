@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
   type FormEvent,
   type KeyboardEvent,
@@ -7,14 +7,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuthStore } from '../store/auth-store';
 
 export function EmailVerificationPage() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
 
-  const isLoading = false;
+  const { error, isLoading, verifyEmail } = useAuthStore();
 
   const handleChange = (index: number, value: string) => {
     // Accepts only the last character typed
@@ -57,13 +60,21 @@ export function EmailVerificationPage() {
   };
 
   const handleSubmit = useCallback(
-    (e: FormEvent | Event) => {
+    async (e: FormEvent | Event) => {
       e.preventDefault();
 
       const verificationCode = code.join("");
-      console.log(`Verification code submitted: ${verificationCode}`);
+
+      try {
+       await verifyEmail(verificationCode);
+       navigate("/");
+       toast.success("Email verified successfully!");
+      } catch (error: any) {
+        console.log(error);
+        toast.error(error.response.data.message || "Failed to verify email");
+      }
     },
-    [code]
+    [code, navigate, verifyEmail]
   );
 
   // Auto submit when all fields are filled
@@ -113,6 +124,8 @@ export function EmailVerificationPage() {
               />
             ))}
           </div>
+
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
 
           <motion.button
             whileHover={{ scale: 1.05 }}

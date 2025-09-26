@@ -19,6 +19,7 @@ interface AuthState {
   isCheckingAuth: boolean;
 
   signup: (email: string, password: string, name: string) => Promise<void>;
+  verifyEmail: (code: string) => Promise<any>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -43,10 +44,31 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: true,
         isLoading: false,
       });
-    } catch (err) {
-      const error = err as any;
+    } catch (error: any) {
       set({
-        error: error.response?.data?.message || "Error signing up",
+        error: error.response.data.message || "Error signing up",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  verifyEmail: async (code: string) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await axios.post(`${API_URL}/verify-email`, { code });
+
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      return response.data;
+    } catch (error: any) {
+      set({
+        error: error.response.data.message || "Error verifying email",
         isLoading: false,
       });
       throw error;

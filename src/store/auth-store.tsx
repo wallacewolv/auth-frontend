@@ -23,6 +23,7 @@ interface AuthState {
   isCheckingAuth: boolean;
 
   signup: (email: string, password: string, name: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   verifyEmail: (code: string) => Promise<any>;
   checkAuth: () => Promise<any>;
 }
@@ -52,6 +53,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       set({
         error: error.response.data.message || "Error signing up",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await axios.post(`${API_URL}/login`, {
+        email,
+        password,
+      });
+
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        error: null,
+        isLoading: false,
+      });
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message || "Error logging in",
         isLoading: false,
       });
       throw error;

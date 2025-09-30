@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Input } from "../components/input";
 import { PasswordStrengthMeter } from "../components/password-strength-meter";
 import { useAuthStore } from "../store/auth-store";
+import toast, { Toaster } from "react-hot-toast";
 
 export function SignUpPage() {
   const [name, setName] = useState("");
@@ -22,8 +23,8 @@ export function SignUpPage() {
     try {
       await signup(email, password, name);
       navigate("/verify-email");
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error(error.response.data.message || "Failed to sign up");
     }
   };
 
@@ -100,6 +101,7 @@ export function SignUpPage() {
           </Link>
         </p>
       </div>
+      <Toaster />
     </motion.div>
   );
 }
